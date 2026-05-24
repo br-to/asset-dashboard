@@ -7,6 +7,7 @@ __pycache__/
 .venv/
 scraper/data/
 scraper/config.yaml
+frontend/.auth-data.json
 
 .env
 .env.local

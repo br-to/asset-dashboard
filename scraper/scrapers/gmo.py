@@ -11,13 +11,15 @@ from datetime import datetime
 
 import requests
 import yaml
+import os
+import sys
+
+sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
+from config_loader import load_config
 
 
 def _load_config():
-    import os
-    config_path = os.path.join(os.path.dirname(__file__), "..", "config.yaml")
-    with open(config_path, "r") as f:
-        return yaml.safe_load(f)["gmo"]
+    return load_config()["gmo"]
 
 
 def _make_headers(method: str, path: str, body: str = "") -> dict:

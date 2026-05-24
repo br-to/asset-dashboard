@@ -11,12 +11,14 @@ import json
 import requests
 import yaml
 import os
+import sys
+
+sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
+from config_loader import load_config
 
 
 def _load_config():
-    config_path = os.path.join(os.path.dirname(__file__), "..", "config.yaml")
-    with open(config_path, "r") as f:
-        return yaml.safe_load(f)["coincheck"]
+    return load_config()["coincheck"]
 
 
 def fetch_balances(config: dict = None) -> list[dict]:
