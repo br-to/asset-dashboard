@@ -28,6 +28,7 @@ CHAINS = {
     "ethereum": {"chainid": "1", "native": "ETH", "native_decimals": 18},
     "polygon": {"chainid": "137", "native": "POL", "native_decimals": 18},
     "base": {"chainid": "8453", "native": "ETH", "native_decimals": 18},
+    "worldchain": {"chainid": "480", "native": "ETH", "native_decimals": 18},
 }
 
 # 主要ERC-20トークン (チェーン別)
@@ -50,6 +51,10 @@ ERC20_TOKENS = {
         "USDC": "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913",
         "WETH": "0x4200000000000000000000000000000000000006",
     },
+    "worldchain": {
+        "USDC": "0x79A02482A880bCE3F13e09Da970dC34db4CD24d1",
+        "Re7WLD": "0x348831b46876d3df2db98bdec5e3b4083329ab9f",
+    },
 }
 
 # トークンのdecimals
@@ -61,6 +66,7 @@ TOKEN_DECIMALS = {
     "WBTC": 8,
     "POL": 18,
     "JPYC": 18,
+    "Re7WLD": 18,
 }
 
 
@@ -110,7 +116,7 @@ def _get_all_prices() -> dict:
         res = requests.get(
             "https://api.coingecko.com/api/v3/simple/price",
             params={
-                "ids": "ethereum,bitcoin,polygon-ecosystem-token,usd-coin",
+                "ids": "ethereum,bitcoin,polygon-ecosystem-token,usd-coin,worldcoin-wld",
                 "vs_currencies": "jpy",
             },
             timeout=10,
@@ -121,9 +127,10 @@ def _get_all_prices() -> dict:
             "btc": data.get("bitcoin", {}).get("jpy", 0),
             "pol": data.get("polygon-ecosystem-token", {}).get("jpy", 0),
             "usdjpy": data.get("usd-coin", {}).get("jpy", 155),
+            "wld": data.get("worldcoin-wld", {}).get("jpy", 0),
         }
     except Exception:
-        return {"eth": 0, "btc": 0, "pol": 0, "usdjpy": 155}
+        return {"eth": 0, "btc": 0, "pol": 0, "usdjpy": 155, "wld": 0}
 
 
 def _get_usdjpy_rate() -> float:
@@ -158,6 +165,7 @@ def fetch_balances(config: dict = None) -> list[dict]:
     btc_price = prices["btc"]
     pol_price = prices["pol"]
     usdjpy = prices["usdjpy"]
+    wld_price = prices["wld"]
 
     # 対応チェーン一覧
     # ethereum/polygon: Etherscan V2 (free)
@@ -165,6 +173,7 @@ def fetch_balances(config: dict = None) -> list[dict]:
     ETHERSCAN_CHAINS = ["ethereum", "polygon"]
     BLOCKSCOUT_CHAINS = {
         "base": "https://base.blockscout.com/api",
+        "worldchain": "https://worldchain-mainnet.explorer.alchemy.com/api",
     }
 
     for wallet in wallets:
@@ -246,6 +255,8 @@ def fetch_balances(config: dict = None) -> list[dict]:
                             jpy_value = amount * eth_price if eth_price else None
                         elif token_name == "WBTC":
                             jpy_value = amount * btc_price if btc_price else None
+                        elif token_name == "Re7WLD":
+                            jpy_value = amount * wld_price if wld_price else None
                         else:
                             jpy_value = None
 
@@ -320,6 +331,8 @@ def fetch_balances(config: dict = None) -> list[dict]:
                             jpy_value = amount
                         elif token_name == "WETH":
                             jpy_value = amount * eth_price if eth_price else None
+                        elif token_name == "Re7WLD":
+                            jpy_value = amount * wld_price if wld_price else None
                         else:
                             jpy_value = None
                         balances.append({
