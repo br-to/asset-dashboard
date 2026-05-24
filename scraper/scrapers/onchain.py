@@ -149,14 +149,19 @@ def fetch_balances(config: dict = None) -> list[dict]:
     pol_price = prices["pol"]
     usdjpy = prices["usdjpy"]
 
-    # 対応チェーン一覧 (無料プランで使えるもの)
-    supported_chains = ["ethereum", "polygon"]
+    # 対応チェーン一覧
+    # ethereum/polygon: Etherscan V2 (free)
+    # base: Blockscout (free, no key needed)
+    ETHERSCAN_CHAINS = ["ethereum", "polygon"]
+    BLOCKSCOUT_CHAINS = {
+        "base": "https://base.blockscout.com/api",
+    }
 
     for wallet in wallets:
         address = wallet["address"]
         label = wallet.get("label", "wallet")
 
-        for chain_name in supported_chains:
+        for chain_name in ETHERSCAN_CHAINS:
             chain = CHAINS[chain_name]
             chainid = chain["chainid"]
             native = chain["native"]
@@ -236,6 +241,76 @@ def fetch_balances(config: dict = None) -> list[dict]:
                         balances.append({
                             "service": "onchain",
                             "asset_name": f"{token_name} ({label}/{chain_label})",
+                            "amount": amount,
+                            "jpy_value": jpy_value,
+                        })
+                except Exception:
+                    pass
+
+        # Blockscout対応チェーン (Base等)
+        for chain_name, blockscout_url in BLOCKSCOUT_CHAINS.items():
+            chain = CHAINS[chain_name]
+            native = chain["native"]
+
+            # ネイティブトークン残高
+            try:
+                res = requests.get(
+                    blockscout_url,
+                    params={
+                        "module": "account",
+                        "action": "balance",
+                        "address": address,
+                    },
+                    timeout=10,
+                )
+                data = res.json()
+                if data.get("status") == "1":
+                    raw = int(data["result"])
+                    amount = raw / (10 ** chain["native_decimals"])
+                    if amount > 0:
+                        if native == "ETH":
+                            jpy_value = amount * eth_price if eth_price else None
+                        else:
+                            jpy_value = None
+                        balances.append({
+                            "service": "onchain",
+                            "asset_name": f"{native} ({label}/{chain_name})",
+                            "amount": amount,
+                            "jpy_value": jpy_value,
+                        })
+            except Exception:
+                pass
+
+            # ERC-20トークン
+            tokens = ERC20_TOKENS.get(chain_name, {})
+            for token_name, contract_address in tokens.items():
+                try:
+                    res = requests.get(
+                        blockscout_url,
+                        params={
+                            "module": "account",
+                            "action": "tokenbalance",
+                            "contractaddress": contract_address,
+                            "address": address,
+                        },
+                        timeout=10,
+                    )
+                    data = res.json()
+                    if data.get("status") == "1":
+                        raw_balance = int(data["result"])
+                        decimals = TOKEN_DECIMALS.get(token_name, 18)
+                        amount = raw_balance / (10 ** decimals)
+                        if amount == 0:
+                            continue
+                        if token_name in ("USDC", "USDT", "DAI"):
+                            jpy_value = amount * usdjpy
+                        elif token_name == "WETH":
+                            jpy_value = amount * eth_price if eth_price else None
+                        else:
+                            jpy_value = None
+                        balances.append({
+                            "service": "onchain",
+                            "asset_name": f"{token_name} ({label}/{chain_name})",
                             "amount": amount,
                             "jpy_value": jpy_value,
                         })
