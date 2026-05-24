@@ -21,14 +21,14 @@ interface ServiceSummary {
 function EyeIcon({ open }: { open: boolean }) {
   if (open) {
     return (
-      <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
         <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
         <circle cx="12" cy="12" r="3"/>
       </svg>
     );
   }
   return (
-    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
       <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94"/>
       <path d="M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19"/>
       <line x1="1" y1="1" x2="23" y2="23"/>
@@ -59,47 +59,57 @@ export default function Home() {
   }, []);
 
   return (
-    <main className="max-w-4xl mx-auto px-4 py-8">
-      <div className="flex items-center justify-between mb-2">
-        <h1 className="text-3xl font-bold">Asset Dashboard</h1>
-        <button
-          onClick={() => setVisible(!visible)}
-          className="text-slate-400 hover:text-slate-200 transition p-2"
-          aria-label={visible ? "残高を隠す" : "残高を表示"}
-        >
-          <EyeIcon open={visible} />
-        </button>
-      </div>
-      <p className="text-slate-400 mb-8">資産管理ダッシュボード</p>
-
-      {loading && <p className="text-slate-400">読み込み中...</p>}
-      {error && <p className="text-red-400">エラー: {error}</p>}
-
-      {!loading && !error && (
-        <>
-          <div className="bg-slate-800 rounded-lg p-6 mb-8 border border-slate-700">
-            <p className="text-slate-400 text-sm">総資産</p>
-            <p className="text-4xl font-bold mt-1">
-              {visible
-                ? <>{totalJpy.toLocaleString()} <span className="text-lg">JPY</span></>
-                : <span className="text-slate-500">*****</span>
-              }
-            </p>
+    <>
+      <div className="scan-line" />
+      <main className="max-w-5xl mx-auto px-4 py-10">
+        <div className="flex items-center justify-between mb-2">
+          <div className="flex items-center gap-3">
+            <div className="pulse-dot" />
+            <h1 className="text-2xl font-bold text-white tracking-wide">
+              ASSET <span className="neon-text glow-green">DASHBOARD</span>
+            </h1>
           </div>
+          <button
+            onClick={() => setVisible(!visible)}
+            className="text-gray-500 hover:text-green-400 transition p-2"
+            aria-label={visible ? "残高を隠す" : "残高を表示"}
+          >
+            <EyeIcon open={visible} />
+          </button>
+        </div>
+        <p className="text-gray-600 text-sm mb-10 ml-5">PERSONAL WEALTH MONITOR</p>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {services.map((svc) => (
-              <BalanceCard key={svc.service} summary={svc} visible={visible} />
-            ))}
-          </div>
+        {loading && <p className="text-gray-500 text-center">LOADING...</p>}
+        {error && <p className="text-red-400 text-center">ERROR: {error}</p>}
 
-          {services.length === 0 && (
-            <p className="text-slate-500 text-center mt-8">
-              データがありません。スクレイパーを実行してください。
-            </p>
-          )}
-        </>
-      )}
-    </main>
+        {!loading && !error && (
+          <>
+            <div className="total-card rounded-xl p-8 mb-10">
+              <div className="flex items-center gap-2 mb-2">
+                <span className="text-xs text-gray-400 uppercase tracking-widest">Total Assets</span>
+              </div>
+              <p className="text-5xl font-bold neon-amount glow-green">
+                {visible
+                  ? <>{totalJpy.toLocaleString()} <span className="text-lg text-gray-400">JPY</span></>
+                  : <span className="text-gray-600">*****</span>
+                }
+              </p>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              {services.map((svc) => (
+                <BalanceCard key={svc.service} summary={svc} visible={visible} />
+              ))}
+            </div>
+
+            {services.length === 0 && (
+              <p className="text-gray-600 text-center mt-8">
+                NO DATA. RUN SCRAPER FIRST.
+              </p>
+            )}
+          </>
+        )}
+      </main>
+    </>
   );
 }

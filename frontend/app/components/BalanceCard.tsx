@@ -15,25 +15,27 @@ interface ServiceSummary {
 
 export function BalanceCard({ summary, visible }: { summary: ServiceSummary; visible: boolean }) {
   return (
-    <div className="bg-slate-800 rounded-lg p-4 border border-slate-700">
-      <div className="flex justify-between items-start mb-3">
-        <h3 className="font-semibold text-lg">{summary.service}</h3>
-        <span className="text-xs text-slate-500">{summary.fetched_at}</span>
+    <div className="card-glow rounded-xl p-5">
+      <div className="flex justify-between items-start mb-4">
+        <h3 className="font-semibold text-sm text-purple-300 uppercase tracking-wider">{summary.service}</h3>
+        <span className="text-[10px] text-gray-600">{summary.fetched_at}</span>
       </div>
-      <p className="text-2xl font-bold mb-3">
+      <p className="text-2xl font-bold mb-4">
         {visible
-          ? <>{summary.total_jpy.toLocaleString()}{" "}<span className="text-sm text-slate-400">JPY</span></>
-          : <span className="text-slate-500">*****</span>
+          ? <span className="neon-amount">{summary.total_jpy.toLocaleString()}<span className="text-xs text-gray-500 ml-1">JPY</span></span>
+          : <span className="text-gray-700">*****</span>
         }
       </p>
-      <ul className="space-y-1">
+      <ul className="space-y-2">
         {summary.assets.map((asset, i) => (
           <li
             key={i}
-            className="flex justify-between text-sm text-slate-300"
+            className="flex justify-between text-xs"
           >
-            <span>{asset.asset_name}</span>
-            <span>{visible ? asset.amount.toLocaleString() : "***"}</span>
+            <span className="text-gray-400">{asset.asset_name}</span>
+            <span className="text-gray-300 font-mono">
+              {visible ? asset.amount.toLocaleString(undefined, { maximumFractionDigits: 6 }) : "***"}
+            </span>
           </li>
         ))}
       </ul>
