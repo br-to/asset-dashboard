@@ -31,11 +31,13 @@ ERC20_TOKENS = {
         "DAI": "0x6B175474E89094C44Da98b954EedeAC495271d0F",
         "WETH": "0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2",
         "WBTC": "0x2260FAC5E5542a773Aa44fBCfeDf7C193bc2C599",
+        "JPYC": "0x431D5dfF03120AFA4bDf332c61A6e1766eF37BDB",
     },
     "polygon": {
         "USDC": "0x3c499c542cEF5E3811e1192ce70d8cC03d5c3359",
         "USDT": "0xc2132D05D31c914a87C6611C10748AEb04B58e8F",
         "WETH": "0x7ceB23fD6bC0adD59E62ac25578270cFf1b9f619",
+        "JPYC": "0x431D5dfF03120AFA4bDf332c61A6e1766eF37BDB",
     },
     "base": {
         "USDC": "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913",
@@ -51,6 +53,7 @@ TOKEN_DECIMALS = {
     "WETH": 18,
     "WBTC": 8,
     "POL": 18,
+    "JPYC": 18,
 }
 
 
@@ -230,6 +233,8 @@ def fetch_balances(config: dict = None) -> list[dict]:
 
                         if token_name in ("USDC", "USDT", "DAI"):
                             jpy_value = amount * usdjpy
+                        elif token_name == "JPYC":
+                            jpy_value = amount
                         elif token_name == "WETH":
                             jpy_value = amount * eth_price if eth_price else None
                         elif token_name == "WBTC":
@@ -304,6 +309,8 @@ def fetch_balances(config: dict = None) -> list[dict]:
                             continue
                         if token_name in ("USDC", "USDT", "DAI"):
                             jpy_value = amount * usdjpy
+                        elif token_name == "JPYC":
+                            jpy_value = amount
                         elif token_name == "WETH":
                             jpy_value = amount * eth_price if eth_price else None
                         else:
