@@ -49,10 +49,10 @@ export async function GET() {
         fetched_at: string;
       }[];
 
-      const total_jpy = assets.reduce(
+      const total_jpy = Math.floor(assets.reduce(
         (sum, a) => sum + (a.jpy_value || 0),
         0
-      );
+      ));
 
       return {
         service,
@@ -62,7 +62,7 @@ export async function GET() {
       };
     });
 
-    const total_jpy = services.reduce((sum, s) => sum + s.total_jpy, 0);
+    const total_jpy = Math.floor(services.reduce((sum, s) => sum + s.total_jpy, 0));
 
     return NextResponse.json({ total_jpy, services });
   } finally {
