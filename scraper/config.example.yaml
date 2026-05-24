@@ -1,0 +1,29 @@
+# 資産管理ダッシュボード設定ファイル
+# このファイルを config.yaml にコピーして値を埋めてください
+
+gmo:
+  api_key: ""
+  api_secret: ""
+
+coincheck:
+  access_key: ""
+  secret_key: ""
+
+onchain:
+  alchemy_api_key: ""
+  etherscan_api_key: ""
+  wallets:
+    - address: ""
+      label: "main"
+
+rakuten_bank:
+  username: ""
+  password: ""
+
+rakuten_sec:
+  username: ""
+  password: ""
+
+paypay:
+  phone: ""
+  password: ""
