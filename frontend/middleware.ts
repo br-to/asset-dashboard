@@ -5,7 +5,14 @@ export const runtime = "nodejs";
 
 const PUBLIC_PATHS = ["/login", "/api/auth/register", "/api/auth/login", "/api/auth/register/verify", "/api/auth/login/verify"];
 
+// 認証を一時的に無効化する場合はtrueにする
+const AUTH_DISABLED = true;
+
 export async function middleware(request: NextRequest) {
+  if (AUTH_DISABLED) {
+    return NextResponse.next();
+  }
+
   const { pathname } = request.nextUrl;
 
   if (PUBLIC_PATHS.some((p) => pathname.startsWith(p))) {

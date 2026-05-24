@@ -13,7 +13,7 @@ interface ServiceSummary {
   fetched_at: string;
 }
 
-export function BalanceCard({ summary }: { summary: ServiceSummary }) {
+export function BalanceCard({ summary, visible }: { summary: ServiceSummary; visible: boolean }) {
   return (
     <div className="bg-slate-800 rounded-lg p-4 border border-slate-700">
       <div className="flex justify-between items-start mb-3">
@@ -21,8 +21,10 @@ export function BalanceCard({ summary }: { summary: ServiceSummary }) {
         <span className="text-xs text-slate-500">{summary.fetched_at}</span>
       </div>
       <p className="text-2xl font-bold mb-3">
-        {summary.total_jpy.toLocaleString()}{" "}
-        <span className="text-sm text-slate-400">JPY</span>
+        {visible
+          ? <>{summary.total_jpy.toLocaleString()}{" "}<span className="text-sm text-slate-400">JPY</span></>
+          : <span className="text-slate-500">*****</span>
+        }
       </p>
       <ul className="space-y-1">
         {summary.assets.map((asset, i) => (
@@ -31,7 +33,7 @@ export function BalanceCard({ summary }: { summary: ServiceSummary }) {
             className="flex justify-between text-sm text-slate-300"
           >
             <span>{asset.asset_name}</span>
-            <span>{asset.amount.toLocaleString()}</span>
+            <span>{visible ? asset.amount.toLocaleString() : "***"}</span>
           </li>
         ))}
       </ul>
