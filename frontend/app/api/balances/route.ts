@@ -3,6 +3,8 @@ import Database from "better-sqlite3";
 import path from "path";
 import fs from "fs";
 
+export const dynamic = "force-dynamic";
+
 const DB_PATH = path.resolve(
   process.cwd(),
   "..",
